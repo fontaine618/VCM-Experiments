@@ -1,0 +1,168 @@
+---
+title: "DMBT1 Longitudinal Differential Abundance - Otu Results"
+author: "Simon Fontaine"
+date: "16/05/2023"
+output:
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+  html_document:
+    toc: yes
+    toc_float: yes
+theme: cosmo
+highlight: haddock
+smooth_scroll: yes
+code_fold: hide
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE, message=FALSE, warning=FALSE, cache=TRUE, fig.width=8)
+
+# ==============================================================================
+# Required packages
+library(tidyverse)
+library(magrittr)
+library(dplyr)
+theme_set(theme_minimal())
+# ==============================================================================
+```
+
+
+## Analysis description
+
+### Goal
+
+Investigate the temporal relationship between 
+
+- **genotype** (KO vs WT),
+- **histopathology** (hyperplasia/CIS and SCC) and 
+
+in terms of predictive power of the
+**microbial composition** (clr-transformed OTUs).
+
+### Methodology
+
+For microbial compositions, I used the CLR-transformed counts (after zero-replacement).
+I applied our methodology to
+
+- **All OTUs which are present (count above 0) in at least 5\% of samples (187 OTUs).**
+
+
+### Hyperplasia/CIS vs SCC model
+
+The model is given by
+
+$$
+    y(t)
+    \sim
+    \beta_{hp/cis}(t) + \beta_{scc}(t)\mathbb I[scc]
+    + \beta_{ko}(t)\mathbb I[ko] + \beta_{scc:ko}\mathbb I[scc, ko]
+    + \alpha\mathbb I[Female]
+$$
+Here are the relevant quantities to study:
+
+```{r, echo=F}
+# DiagrammeR::mermaid("
+# graph TB
+#   A[WT, HP/CIS]
+#   B[WT, SCC]
+#   C[KO, HP/CIS]
+#   D[KO, SCC]
+#   A-- + scc -->B
+#   A-- + ko -->C
+#   B-- + ko + scc:ko -->D
+#   C-- + scc + scc:ko -->D
+# ", width=300, height=300)
+```
+
+In particular, we plot:
+
+- the estimated mean curve in each group
+- the estimated differences 
+
+
+## Results
+
+### OTUs with genotype differences
+
+#### Early differences:
+
+- **Otu 0028**: family *Porphyromonadaceae* (only sig. in SCC, but similar trend in HP/CIS)
+- **Otu 0113**: family *Porphyromonadaceae* (only sig. in SCC, but similar trend in HP/CIS)
+- **Otu 0116**: order *Bacteroidales* (only sig. in SCC, but similar trend in HP/CIS)
+
+#### Midrange differences:
+
+- **Otu 0004**: genus *Streptococcus*
+- **Otu 0033**: family *Porphyromonadaceae*
+- **Otu 0050**: family *Lachnospiraceae*
+- **Otu 0059**: genus *Sediminibacterium* (only sig. in SCC, but similar trend in HP/CIS)
+- **Otu 0078**: family *Lactobacillaceae*
+
+#### Late differences
+
+- **Otu 0013**: family *Comamonadaceae*
+- **Otu 0018**: genus *Bradyrhizobium*
+
+#### Overall differences
+
+- **Otu 0007**: genus *Cupriavidus*
+
+### OTUs with histopathology differences
+
+#### Early differences:
+
+- **Otu 0049**: genus *Bacteroides* (only sig. in KO, but similar trend in WT)
+
+#### Midrange differences:
+
+- **Otu 0015**: order *Lactobacillales*
+- **Otu 0045**: genus *Alistipes* (only sig. in KO, but similar trend in WT)
+- **Otu 0101**: family *Porphyromonadaceae* (only sig. in WT, but similar trend in KO)
+- **Otu 0143**: genus *Alistipes*
+
+### OTUs with genotype-hitopathology interactions
+
+#### Early differences between genotypes within SCC (one is reverse of the other three):
+
+- **Otu 0014**: family *Staphylococcaceae*
+- **Otu 0040**: family *Porphyromonadaceae*
+- **Otu 0096**: family *Porphyromonadaceae*
+- **Otu 0526**: phylum *Bacteroidetes*
+
+#### Midrange differences between genotypes within SCC:
+
+- **Otu 0257**: genus *Streptococcus*
+
+#### Late differences between genotypes within HP/CIS:
+
+- **Otu 0252**: family *Coriobacteriaceae*
+
+#### Overall differences between genotypes within SCC (reverse of each other):
+
+- **Otu 0009**: genus *Staphylococcus*
+- **Otu 0322**: family *Porphyromonadaceae*
+
+#### KO SCC lower in early window:
+
+- **Otu 0039**: family *Lachnospiraceae*
+- **Otu 0053**: family *Porphyromonadaceae*
+- **Otu 0062**: family *Porphyromonadaceae*
+- **Otu 0120**: family *Lachnospiraceae*
+
+#### Differences in histopathology early; differences in genotype within SCC
+
+- **Otu 0048**: family *Lachnospiraceae*
+- **Otu 0192**: family *Lachnospiraceae*
+
+#### Odd behavior at week 12
+
+- **Otu 0046**: family *Lachnospiraceae*
+- **Otu 0318**: family *Lachnospiraceae*
+
+#### Hard to describe/group
+
+- **Otu 0016**: genus *Caulobacter*
+- **Otu 0084**: family *Lachnospiraceae*
+- **Otu 0105**: order *Bacteroidales*
+- **Otu 0133**: phylum *Bacteroidetes*

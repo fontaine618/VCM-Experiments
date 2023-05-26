@@ -1,0 +1,195 @@
+### [bt]: This is batchtools v0.9.17
+### [bt]: Starting calculation of 1 jobs
+### [bt]: Setting working directory to '/home/simon/Documents/VCM-Experiments'
+### [bt]: Memory measurement disabled
+### [bt]: Starting job [batchtools job.id=373]
+### [bt]: Generating problem instance for problem 'synthetic' ...
+### [bt]: Applying algorithm 'LSVCMM' on problem 'synthetic' for job 373 (seed = 374) ...
+[VCMM] Initializing data and models ...done.
+[VCMM] Setting kernel scale to 2.67215 (Iteration 1/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.0101382)
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.00270097)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 2.097 (Iteration 2/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.0130009)
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.0044526)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 1.64564 (Iteration 3/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.0171299)
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.00764373)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 1.29143 (Iteration 4/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.0249678)
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.013537)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 1.01346 (Iteration 5/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.0410712)
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.0242123)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.795326 (Iteration 6/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.0760264)
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.0427605)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.62414 (Iteration 7/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.149342)
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.0727093)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.4898 (Iteration 8/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.271651)
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.116306)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.384375 (Iteration 9/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.429598)
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.172004)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.301642 (Iteration 10/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.634664)
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.241298)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.236717 (Iteration 11/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.863229)
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.325119)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.185766 (Iteration 12/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=1.07813)
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.408459)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.145782 (Iteration 13/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=1.26785)
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.483898)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.114404 (Iteration 14/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=1.4451)
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.547675)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.0897794 (Iteration 15/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=1.61965)
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.600454)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.0704553 (Iteration 16/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=1.84016)
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.658512)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.0552905 (Iteration 17/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=2.20615)
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.769017)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.0433897 (Iteration 18/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=2.77035)
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.973098)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.0340505 (Iteration 19/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=3.61275)
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 1.25725)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.0267215 (Iteration 20/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=4.57709)
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 1.60931)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+ [1] 0 0 0 0 1 1 1 1 1 1 1
+Levels: 0 1
+ [1] 1 1 1 1 1 1 0 0 0 0 0
+Levels: 0 1
+
+### [bt]: Job terminated successfully [batchtools job.id=373]
+### [bt]: Calculation finished!

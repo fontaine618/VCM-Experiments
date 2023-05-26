@@ -1,0 +1,472 @@
+---
+title: "DMBT1 Mice Microbiome Study -- Stable Taxa Identification"
+author: "Simon Fontaine"
+date: "22/04/2023"
+output:
+  html_document:
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: 3
+theme: cosmo
+highlight: haddock
+smooth_scroll: yes
+code_fold: hide
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=TRUE, message=FALSE, warning=FALSE, cache=TRUE, fig.width=8)
+
+# ==============================================================================
+# Required packages
+library(tidyverse)
+library(janitor)
+library(ggforce)
+library(gridExtra)
+library(phyloseq)
+library(microViz)
+library(microbiome)
+library(ape)
+library(lme4)
+library(sjPlot)
+library(performance)
+library(visdat)
+library(naniar)
+library(clusterProfiler)
+theme_set(theme_minimal())
+# ==============================================================================
+
+source("/home/simon/Documents/VCM-Experiments/process_data.R")
+```
+
+# Data description
+
+## Study design
+
+The goal of the study is to understand the interaction between
+
+- The DBMT1 gene
+- The oral microbiome
+- Oral Squamous Cell Carcinoma (OSCC) progression
+
+Sixty-five (65) mice were bred into two groups: wild-type (WT) and DMBT1 knock-out (KO).
+At some pre-specified time (labeled week 0 here after), a carcinogen was introduce to induce
+OSCC. Saliva sample were collected over time for each mouse and 16S sequencing was performed.
+
+Cancer progression was measured at the end of the study (22 weeks) and classified into three categories:
+hyperplasia, carcinoma in situ (CIS) and squamous cell carcinoma (SCC). 
+The researcher also suspect that sex may play a role, so sex was also recorded.
+
+## Available data
+
+For each mouse:
+
+- Sex (M/F)
+- Cancer progression at week 22 (hyperplasia, CIS, SCC)
+- Genotype (WT/KO)
+- Longitudinal microbial composition (1726 OTUs with taxonomy)
+    - Measured at weeks 0, 4, 8, 12, 16 and 22
+    - Not all time points are available: we only have 294 samples (4.5 samples/mouse)
+    - I only have taxonomy up to Genus level
+    
+## Summaries
+
+- Sex: 36 Females, 29 Males
+- Genotype: 31 KO, 34 WT
+- Diagnosis: 19 hyperplasia, 24 CIS, 22 SCC
+- Samples per time points: 65, 37, 37, 36, 55, 64 at 0, 4, 8, 12, 16, 22, respectively
+- Samples per mouse: 1: 1; 5: 8; 3: 19; 5: 2; 6: 35
+
+# OTU-level analysis (presence/absence)
+
+
+```{r}
+dat = pseq
+
+lubomTaxaStats = tibble(taxon = taxa_names(dat),
+                        prevalence = prevalence(dat),
+                        total_abundance = taxa_sums(dat),
+                        nSamples = nsamples(dat)*prevalence(dat))
+
+lubomTaxaStats %>% 
+  ggplot() +
+  aes(x = total_abundance, y = prevalence) +
+  geom_point(alpha = 0.5) +
+  geom_rug(alpha = 0.1) +
+  labs(title = "DMBT1 Study OTU Prevalence vs Total Abundance") +
+  scale_x_continuous(labels = scales::label_number(), name = "Total Abundance") +
+  scale_y_continuous(labels = scales::label_percent(), 
+                     breaks = scales::breaks_pretty(n = 11),
+                     name = "Prevalence (%)", 
+                     sec.axis = sec_axis(trans = ~ . * nsamples(dat),
+                                         breaks = scales::breaks_pretty(n = 11),
+                                         name = "Prevalence (N samples)")) +
+  geom_vline(xintercept = 10000, color = "red", linetype = "dotted") +
+  geom_hline(yintercept = 0.1, color = "red", linetype = "dotted") +
+  geom_hline(yintercept = 0.2, color = "blue", linetype = "dotted") +
+  theme(plot.title = element_text(hjust = 0.5, face = "bold"))
+
+# prevalent taxa (prevalence > 0.1)
+prev_tax = lubomTaxaStats %>% 
+  filter(prevalence > 0.1) %>% 
+  dplyr::select(taxon) %>% 
+  pull()
+
+# rare taxa (prevalence <= 0.1)
+rare_tax = lubomTaxaStats %>% 
+  filter(prevalence <= 0.1 & nSamples == 1) %>% 
+  dplyr::select(taxon) %>% 
+  pull()
+```
+
+
+```{r, message = FALSE}
+# make the raw data compositional
+dat_rel = dat %>% 
+  tax_transform("compositional")
+
+# get an OTU table for prevalent taxa
+otu_prev_tax = otu_table(dat_rel)[, prev_tax] %>% 
+  as.data.frame() %>% 
+  rownames_to_column(".sample_name")
+
+# get an OTU table for rare taxa
+otu_rare_tax = otu_table(dat_rel)[, rare_tax] %>% 
+  as.data.frame() %>% 
+  rownames_to_column(".sample_name")
+
+sample_df = dat_rel %>% samdat_tbl()
+```
+
+
+```{r}
+dat_tax = prev_tax
+
+# # merge relative abundance data and sample data (clinical data)
+# sample_df = merge(sample_df, otu_prev_tax, by = ".sample_name") %>% 
+#   group_by(sampleName) %>% 
+#   filter(all(c("0", "6", "12") %in% t)) %>% 
+#   filter(t %in% c("0", "6", "12")) %>% 
+#   ungroup() %>%
+#   mutate(t = as.numeric(t),
+#          PD = as.factor(PD))
+
+sample_df = merge(sample_df, otu_prev_tax, by = ".sample_name") %>%
+  mutate(
+    t = visit_id, 
+    subject_id = as.factor(subject_id)
+  )
+
+```
+
+
+```{r}
+glmer_icc_calc = function(df, spec, pres_thre) {
+data = df %>%
+    mutate(across(all_of(spec), function(x) ifelse(x > pres_thre, 1, 0))) %>%
+    mutate(across(all_of(spec), as.factor)) %>% 
+    data.table::setnames(spec, paste("OTU_", rep(1:length(spec)), sep = "")) # change the long taxa names before fitting GLMMs
+  
+  resp = data %>% 
+    dplyr::select(contains("OTU")) %>% 
+    colnames()
+  
+  models = list()
+  icc = c()
+  reVar = c()
+  
+  for (i in resp) {
+    resp_var = data %>% select(i) %>% var()
+    
+    # if the response variable has 0 variance for a certain taxon (i.e., it's either all present/absent across all samples), set ICC and random effects variance to 0 - we're not interested in those taxa
+    if (resp_var == 0) { 
+      icc = append(icc, 0)
+      reVar = append(reVar, 0)
+    }
+    
+    else{
+      f = formula(paste(i, " ~ t + Type + (1|subject_id)")) # treat time points (t) and PD status (PD) as fixed effects, while treating sample IDs as a random effect
+      models[[i]] = glmer(f, data, family = binomial,
+                          control = glmerControl(optimizer = "bobyqa",
+                                                 optCtrl = list(maxfun = 2e4)),
+                          nAGQ = 10) # used nAGQ = 10 to reduce computational time but the higher, the greater accuracy in the evaluation of the log-likelihood it produces 
+      
+      # if a model is singular, set ICC and random effects variance to 0
+      if (isSingular(models[[i]]) == TRUE) {
+        icc = append(icc, 0)
+        reVar = append(reVar, 0)
+      }
+      else {
+        icc = append(icc, performance::icc(models[[i]])$ICC_adjusted)
+        reVar = append(reVar, as.data.frame(VarCorr(models[[i]]))$vcov[1])
+      }
+    }
+  }
+  return(list(models, icc, reVar))
+}
+```
+
+
+
+```{r, warning = FALSE, message = FALSE}
+# test different threshold values for determining whether a taxon is present or not.
+m0 = glmer_icc_calc(sample_df, dat_tax, 0)
+m1 = glmer_icc_calc(sample_df, dat_tax, 0.001)
+m2 = glmer_icc_calc(sample_df, dat_tax, 0.002)
+m3 = glmer_icc_calc(sample_df, dat_tax, 0.003)
+m4 = glmer_icc_calc(sample_df, dat_tax, 0.004)
+m5 = glmer_icc_calc(sample_df, dat_tax, 0.005)
+m6 = glmer_icc_calc(sample_df, dat_tax, 0.006)
+m7 = glmer_icc_calc(sample_df, dat_tax, 0.007)
+m8 = glmer_icc_calc(sample_df, dat_tax, 0.008)
+m9 = glmer_icc_calc(sample_df, dat_tax, 0.009)
+m10 = glmer_icc_calc(sample_df, dat_tax, 0.01)
+```
+
+
+```{r}
+non_conv = c(sum(m0[[2]] == 0), 
+             sum(m1[[2]] == 0),
+             sum(m2[[2]] == 0),
+             sum(m3[[2]] == 0),
+             sum(m4[[2]] == 0),
+             sum(m5[[2]] == 0),
+             sum(m6[[2]] == 0),
+             sum(m7[[2]] == 0),
+             sum(m8[[2]] == 0),
+             sum(m9[[2]] == 0),
+             sum(m10[[2]] == 0))
+
+thre_df = tibble(Threshold = c(0, seq(0.001, 0.01, by = 0.001)),
+                       Non_Convergence = non_conv)
+
+thre_df %>% 
+  ggplot() +
+  aes(x = Threshold, y = Non_Convergence) +
+  geom_line() +
+  geom_point(color = "red") +
+  labs(x = "Presence/Absence Threshold", y = "Number of 0 Intraclass Correlation",
+       title = "DMBT1 Study Number of Non-convergent Models across Different Threhold Values") +
+  scale_x_continuous(breaks = c(0, seq(0.001, 0.01, by = 0.001)))
+
+# given 0 threshold yields the smallest number of non-convergent models, use 0 to determine whether a taxon is present or absent
+# relative abundance > 0 - present == 1, otherwise absent == 0
+best_m = m0
+```
+
+
+```{r, warning = FALSE, message = FALSE}
+icc_df = tibble(ASV = dat_tax,
+                Kingdom = tax_table(dat_rel)[dat_tax, 1] %>% as.vector(),
+                Phylum = tax_table(dat_rel)[dat_tax, 2] %>% as.vector(),
+                Class = tax_table(dat_rel)[dat_tax, 3] %>% as.vector(),
+                Order = tax_table(dat_rel)[dat_tax, 4] %>% as.vector(),
+                Family = tax_table(dat_rel)[dat_tax, 5] %>% as.vector(),
+                Genus = tax_table(dat_rel)[dat_tax, 6] %>% as.vector(),
+                Prevalence = prevalence(dat %>% tax_filter(min_prevalence = 0.1)),
+                ICC = best_m[[2]],
+                REVar = best_m[[3]])
+
+icc_hist = icc_df %>% 
+  ggplot() +
+  aes(x = ICC, y = ..density..) +
+  geom_histogram(bins = 15, fill = "navy", color = "black", alpha = 0.7) +
+  geom_density(lwd = 0.5, linetype = 1, color = "red") +
+  labs(x = "Intraclass Correlation", y = "Density")
+
+icc_box = icc_df %>% 
+  ggplot() +
+  aes(x = ICC) +
+  geom_boxplot() +
+  coord_flip() +
+  labs(x = "Intraclass Correlation")
+
+grid.arrange(icc_hist, icc_box, ncol = 2,
+             top = grid::textGrob("DMBT1 Study (OTU) Intraclass Correlation Distribution - Presence/Absence"))
+
+icc_df %>% 
+  ggplot() +
+  aes(x = ICC, y = Prevalence) +
+  geom_point(alpha = 0.7) +
+  geom_rug(alpha = 0.1) +
+  labs(title = "DMBT1 Study (OTU) Intraclass Correlation vs Prevalence") +
+  scale_x_continuous(labels = scales::label_number(), name = "Intraclass Correlation") +
+  scale_y_continuous(labels = scales::label_number(),
+                     breaks = scales::breaks_pretty(n = 10),
+                     sec.axis = sec_axis(trans ~ . * nsamples(dat_rel),
+                                         breaks = scales::breaks_pretty(n = 10),
+                                         name = "Prevalence (N samples)")) +
+  geom_vline(xintercept = 0.85, color = "red", linetype = "dotted") +
+  geom_hline(yintercept = 0.3, color = "blue", linetype = "dotted")
+```
+
+
+```{r}
+stab_thre = 0.85
+prev_thre = 0.3
+icc_df = icc_df %>% 
+  mutate(Stable = as.factor(case_when(ICC >= stab_thre ~ 1,
+                                      TRUE ~ 0)),
+         Prevalent = as.factor(case_when(Prevalence >= prev_thre ~ 1,
+                                         TRUE ~ 0)),
+         StabPrev = as.factor(case_when(Stable == "1" & Prevalent == "1" ~ 1,
+                                        Stable == "1" & Prevalent == "0" ~ 2,
+                                        Stable == "0" & Prevalent == "1" ~ 3,
+                                        Stable == "0" & Prevalent == "0" ~ 4)))
+icc_df
+```
+
+```{r}
+# save icc_df
+write.csv(icc_df, "/home/simon/Documents/VCM-Experiments/figures/DMBT_Report/icc.csv")
+```
+
+
+
+# Genus-level analysis (numerical)
+
+```{r, message=FALSE}
+dat_gen = pseq %>% tax_glom("Genus")
+
+dat_genTaxaStats = tibble(taxon = taxa_names(dat_gen),
+                          prevalence = prevalence(dat_gen),
+                          total_abundance = taxa_sums(dat_gen),
+                          species = tax_table(dat_gen)[, 6] %>% as.vector())
+
+dat_genTaxaStats %>% 
+  ggplot() +
+  aes(x = total_abundance, y = prevalence) +
+  geom_point(alpha = 0.5) + 
+  geom_rug(alpha = 0.1) +
+  labs(title = "DMBT1 Study (Genus) Prevalence vs Total Abundance") +
+  scale_x_continuous(labels = scales::label_number(), name = "Total Abundance") +
+  scale_y_continuous(labels = scales::label_percent(),
+                     breaks = scales::breaks_pretty(n = 10),
+                     name = "Prevalence (%)",
+                     sec.axis = sec_axis(trans ~ . * nsamples(dat_gen),
+                                         breaks = scales::breaks_pretty(n = 10),
+                                         name = "Prevalence (N samples)")) +
+  geom_hline(yintercept = 0.1, color = "red", linetype = "dotted") +
+  geom_hline(yintercept = 0.2, color = "blue", linetype = "dotted")
+```
+
+
+```{r, message = FALSE}
+dat_gen_rel = dat_gen %>%
+  tax_filter(min_prevalence = 0.05) %>% 
+  tax_transform("compositional")
+  
+spec_gen = tax_table(dat_gen_rel)[, 6] %>% as.vector()
+
+gen_sample_df = dat_gen_rel %>% 
+  samdat_tbl()
+
+gen_sample_df[, spec_gen] = NA
+
+for (i in 1:length(spec_gen)) {
+  j = which.max(spec_gen[i] == colnames(gen_sample_df))
+  gen_sample_df[, j] = otu_table(dat_gen_rel)[, i] %>% as.vector()
+}
+
+# I think this was specific to your data?
+# gen_sample_df = gen_sample_df %>% 
+#   group_by(subject_id) %>% 
+#   filter(all(c("0", "6", "12") %in% t)) %>% 
+#   filter(t %in% c("0", "6", "12")) %>% 
+#   ungroup() %>% 
+#   mutate(t = as.numeric(t),
+#          PD = as.factor(PD))
+gen_sample_df = gen_sample_df %>%
+  mutate(
+    t = visit_id, 
+    subject_id = as.factor(subject_id)
+  )
+```
+
+```{r, warning = FALSE, message = FALSE}
+resp = gen_sample_df %>% 
+  dplyr::select(spec_gen) %>% 
+  clean_names() %>% 
+  colnames()
+
+models = list()
+icc = c()
+reVar = c()
+
+for (i in resp) {
+  f = formula(paste(i, " ~ t + type + (1|subject_id)"))
+  models[[i]] = lmer(f, gen_sample_df %>% clean_names(), REML = TRUE)
+    if (isSingular(models[[i]]) == TRUE) {
+    icc = append(icc, 0)
+    reVar = append(reVar, 0)
+  }
+  
+  else {
+  icc = append(icc, performance::icc(models[[i]])$ICC_adjusted)
+  reVar = append(reVar, as.data.frame(VarCorr(models[[i]]))$vcov[1])
+  }
+}
+```
+
+```{r}
+data_gen = dat_gen %>% 
+  tax_filter(min_prevalence = 0.05)
+
+icc_df = tibble(Species = spec_gen,
+                Prevalence = prevalence(data_gen),
+                ICC = icc,
+                REVar = reVar)
+
+icc_hist = icc_df %>% 
+  ggplot() +
+  aes(x = ICC, y = ..density..) +
+  geom_histogram(bins = 15, fill = "navy", color = "black", alpha = 0.7) +
+  geom_density(lwd = 0.5, linetype = 1, color = "red") +
+  labs(x = "Intraclass Correlation", y = "Density")
+
+icc_box = icc_df %>% 
+  ggplot() +
+  aes(x = ICC) +
+  geom_boxplot() +
+  coord_flip() +
+  labs(x = "Intraclass Correlation")
+
+grid.arrange(icc_hist, icc_box, ncol = 2,
+             top = grid::textGrob("DMBT1 Study (Genus) Intraclass Correlation Distribution"))
+```
+
+```{r, message = FALSE}
+icc_thre = quantile(icc_df$ICC, probs = 0.75)
+
+icc_df %>% 
+  ggplot() +
+  aes(x = ICC, y = Prevalence) +
+  geom_point(alpha = 0.5) +
+  geom_rug(alpha = 0.1) +
+  labs(title = "DMBT1 Study (Genus) Intraclass Correlation vs Prevalence") +
+  scale_x_continuous(labels = scales::label_number(), name = "Intraclass Correlation") +
+  scale_y_continuous(labels = scales::label_number(),
+                     breaks = scales::breaks_pretty(n = 10),
+                     sec.axis = sec_axis(trans ~ . * nsamples(data_gen),
+                                         breaks = scales::breaks_pretty(n = 10),
+                                         name = "Prevalence (N samples)")) +
+  geom_vline(xintercept = icc_thre, color = "red", linetype = "dotted") +
+  ggrepel::geom_text_repel(data = function(df) filter(df, ICC > icc_thre),
+                           mapping = aes(label = Species), size = 2.5, min.segment.length = 0, force = 15)
+
+icc_df %>% 
+  ggplot() +
+  aes(x = ICC, y = REVar) +
+  geom_point(alpha = 0.5) +
+  geom_rug(alpha = 0.1) +
+  labs(title = "DMBT1 Study (Genus) Intraclass Correlation vs Random Effects Variance") +
+  scale_x_continuous(labels = scales::label_number(), name = "Intraclass Correlation") +
+  scale_y_continuous(labels = scales::label_number(),
+                     breaks = scales::breaks_pretty(n = 10),
+                     name = "Random Effects Variance") +
+  geom_vline(xintercept = icc_thre, color = "red", linetype = "dotted") +
+  ggrepel::geom_text_repel(data = function(df) filter(df, ICC > icc_thre),
+                           mapping = aes(label = Species), size = 2.5, min.segment.length = 0, force = 15)
+```
+

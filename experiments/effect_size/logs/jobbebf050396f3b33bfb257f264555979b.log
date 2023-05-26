@@ -1,0 +1,218 @@
+### [bt]: This is batchtools v0.9.17
+### [bt]: Starting calculation of 1 jobs
+### [bt]: Setting working directory to '/home/simon/Documents/VCM-Experiments'
+### [bt]: Memory measurement disabled
+### [bt]: Starting job [batchtools job.id=452]
+### [bt]: Generating problem instance for problem 'synthetic' ...
+### [bt]: Applying algorithm 'LSVCMM' on problem 'synthetic' for job 452 (seed = 453) ...
+[VCMM] Initializing data and models ...done.
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Setting kernel scale to 2.67215 (Iteration 1/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.0101496)
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.0013941)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 2.097 (Iteration 2/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.0129161)
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.00335052)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 1.64564 (Iteration 3/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.0172468)
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.00829272)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 1.29143 (Iteration 4/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.0250867)
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.0194191)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 1.01346 (Iteration 5/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.0417978)
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.0392503)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.795326 (Iteration 6/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.0781427)
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.0663702)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.62414 (Iteration 7/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.154292)
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.0987576)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.4898 (Iteration 8/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.277556)
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.140261)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.384375 (Iteration 9/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.448291)
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.197755)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.301642 (Iteration 10/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.6585)
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.271022)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.236717 (Iteration 11/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=0.878391)
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.349719)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.185766 (Iteration 12/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=1.11048)
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.43533)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.145782 (Iteration 13/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=1.30548)
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.531288)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.114404 (Iteration 14/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=1.49537)
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.619883)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.0897794 (Iteration 15/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=1.61985)
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.700746)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.0704553 (Iteration 16/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=1.78741)
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.793099)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.0552905 (Iteration 17/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=2.09846)
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 0.943515)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.0433897 (Iteration 18/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=2.6291)
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 1.18901)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.0340505 (Iteration 19/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=3.40763)
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 1.52446)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMM] Setting kernel scale to 0.0267215 (Iteration 20/20)...done.
+[VCMM] Computing Lipschitz constants ...done. (La=0, Lb=4.31493)
+[VCMM] Computing penalty weights for adaptive SGL ...done.
+[VCMM] Computing maximum regularization parameter 
+       done. (lambda max: 1.94773)
+[VCMM] Starting lambda loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+       ... done.
+[VCMMBoot] Initializing data and models ...done.
+[VCMMBoot] Starting bootstrap loop ...
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+done.
+
+### [bt]: Job terminated successfully [batchtools job.id=452]
+### [bt]: Calculation finished!

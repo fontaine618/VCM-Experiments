@@ -1,0 +1,67 @@
+Algorithm wrapper structure
+========================
+
+Input 
+-----
+
+algorithm = function(data, job, instance, [required_parameters,] ...)
+
+
+Output
+------
+
+metrics: A list containing
+- ise
+- ise0
+- ise1
+- confusion_matrix
+
+vc: A list of length equal to the number of VC functions, each containing a data frame with columns
+- time: time index where the function is evaluated
+- estimate: the estimated value
+- lower: the lower bound of the (simultaneous) confidence band
+- upper: the upper cound of the (simultaneous) confidnece band
+- pvalue: the raw p-value (if available)
+- adj_pvalue: the adjusted p-value (if available)
+- excludes_zero: whether 0 is excluded from the pointwise CI (or if we reject after adjustment)
+
+log: A method-specific output
+
+
+Problem structure
+=================
+
+Input
+-----
+problem = function(data, job, [required_parameters, ] ...)
+
+
+Output
+------
+
+data_long: a data.frame with columns
+- subject_id
+- time
+- group
+- response
+NB: colnames contains the colunm names to be used
+
+data_wide: a data.frame with columns
+- subject_id
+- group
+- tXX where XX is replaced by all observed times
+
+data_wide_imputed: a data.frame similar to data_wide, but where the missing entries are imputed
+using refund::fpca.sc with default arguments
+
+true_values: a data.frame with columns
+- time
+- b0
+- b1
+
+colnames: a list with entires
+- subject_id: for long and wide
+- group: for long and wide
+- long_index: for long format, the time index
+- long_response: for long format, the response
+- wide_times: for wide format, the responses

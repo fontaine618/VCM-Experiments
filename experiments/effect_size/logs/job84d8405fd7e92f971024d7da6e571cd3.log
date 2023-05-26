@@ -1,0 +1,10 @@
+### [bt]: This is batchtools v0.9.17
+### [bt]: Starting calculation of 1 jobs
+### [bt]: Setting working directory to '/home/simon/Documents/VCM-Experiments'
+### [bt]: Memory measurement disabled
+### [bt]: Starting job [batchtools job.id=2577]
+### [bt]: Generating problem instance for problem 'synthetic' ...
+### [bt]: Applying algorithm 'GAMM' on problem 'synthetic' for job 2577 (seed = 2578) ...
+
+### [bt]: Job terminated successfully [batchtools job.id=2577]
+### [bt]: Calculation finished!

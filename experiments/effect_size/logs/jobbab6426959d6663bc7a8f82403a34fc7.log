@@ -1,0 +1,21 @@
+### [bt]: This is batchtools v0.9.17
+### [bt]: Starting calculation of 1 jobs
+### [bt]: Setting working directory to '/home/simon/Documents/VCM-Experiments'
+### [bt]: Memory measurement disabled
+### [bt]: Starting job [batchtools job.id=2658]
+### [bt]: Generating problem instance for problem 'synthetic' ...
+### [bt]: Applying algorithm 'GAMM' on problem 'synthetic' for job 2658 (seed = 2659) ...
+Loading required package: mgcv
+Loading required package: nlme
+
+Attaching package: ‘nlme’
+
+The following object is masked from ‘package:dplyr’:
+
+    collapse
+
+This is mgcv 1.8-42. For overview type 'help("mgcv-package")'.
+Loading required package: gratia
+
+### [bt]: Job terminated successfully [batchtools job.id=2658]
+### [bt]: Calculation finished!

@@ -1,0 +1,12 @@
+### [bt]: This is batchtools v0.9.17
+### [bt]: Starting calculation of 1 jobs
+### [bt]: Setting working directory to '/home/simon/Documents/VCM-Experiments'
+### [bt]: Memory measurement disabled
+### [bt]: Starting job [batchtools job.id=2198]
+### [bt]: Generating problem instance for problem 'synthetic' ...
+### [bt]: Applying algorithm 'LocKer' on problem 'synthetic' for job 2198 (seed = 2199) ...
+Warning in any(output$excludes_zero) :
+  coercing argument of type 'double' to logical
+
+### [bt]: Job terminated successfully [batchtools job.id=2198]
+### [bt]: Calculation finished!

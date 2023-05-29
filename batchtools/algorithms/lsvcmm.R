@@ -50,8 +50,8 @@ lsvcmm_wrapper = function(data, job, instance, selection="aic", boot=F,
       ...
     )
     band_df = VCMM::confidence_band(out_boot, 0.95, "quantile", 2)
-    # b = out_boot$vc[2, ]
-    b = apply(out_boot$vc_boot[2,,], 1, median)
+    b = out_boot$vc[2, ]
+    # b = apply(out_boot$vc_boot[2,,], 1, median)
     
     vc = data.frame(
       time=out$estimated_time,

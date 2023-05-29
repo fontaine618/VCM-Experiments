@@ -8,7 +8,10 @@ theme_set(theme_minimal())
 
 # ==============================================================================
 # Setup batchtools registry
-DIR = "./experiments/exp1/"
+DIR = "./experiments/exp2/"
+
+loadRegistry(DIR, writeable=T)
+
 # removeRegistry()
 registry = makeExperimentRegistry(
   file.dir=DIR, 
@@ -16,7 +19,7 @@ registry = makeExperimentRegistry(
   packages=c("dplyr", "magrittr"),
   source=c("./batchtools/utils/metrics.R")
 )
-registry$cluster.functions = makeClusterFunctionsSocket(ncpus = 10)
+# registry$cluster.functions = makeClusterFunctionsSocket(ncpus = 10)
 export = list()
 # ------------------------------------------------------------------------------
 
@@ -70,22 +73,23 @@ export[["gam_wrapper"]] = gam_wrapper
 
 # ==============================================================================
 # Experimental design
+n_reps=500
 problems = list(
   synthetic=CJ(
     n_subjects=c(100),
     n_timepoints=c(11),
-    prop_observed=c(0.5, 1.), # with and without missing values
+    prop_observed=c(0.6, 1.), # with and without missing values
     observation_variance=c(1.),
     random_effect_variance=c(1., 0.), # with and without random effect
     effect_size=c(1.),
-    seed=seq(3)
+    seed=seq(n_reps)
   )
 )
 
 algorithms = list(
   LSVCMM=CJ(
     selection=c("aic"),
-    boot=c(T),
+    boot=c(F),
     adaptive=c(1.),
     estimate_variance_components=c(F, T),
     random_effect=c(F, T)
@@ -107,13 +111,36 @@ addExperiments(
 # ==============================================================================
 # Get current status
 summarizeExperiments()
+
+# Prepare parameters
+resources = list(
+  account="stats_dept1",
+  partition="standard",
+  memory="6g", # this is per cpu
+  ncpus=1,
+  walltime="4:00:00",
+  chunks.as.arrayjobs=FALSE,
+  job_name="lsvcmm_exp1"
+)
+
 batchExport(export)
 
 # send one job to see if we coded things correctly
-testJob(1, external=T)
+# testJob(1, external=T)
 
-submitJobs(resources=list(walltime=1000))
+chunk_df = data.table(job.id=seq(findJobs() %>% nrow), chunk=1:100)
+head(chunk_df)
+submitJobs(chunk_df, resources)
 getStatus()
+
+getStatus()
+
+not_done = findNotDone()
+
+
+chunk_df = data.table(job.id=not_done$job.id, chunk=1:100)
+head(chunk_df)
+submitJobs(chunk_df, resources)
 # ------------------------------------------------------------------------------
 
 

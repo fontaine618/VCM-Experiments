@@ -1,6 +1,6 @@
 lsvcmm_wrapper = function(data, job, instance, selection="aic", boot=F, 
                           estimate_variance_components=F,
-                          random_effect=T, ...){
+                          random_effect=T, name="", ...){
   t0 = proc.time()
   df = instance$data_long
   out = VCMM::lsvcmm(
@@ -17,10 +17,11 @@ lsvcmm_wrapper = function(data, job, instance, selection="aic", boot=F,
   best_idx = switch(selection,
                 "aic"=which.min(out$models_path$aic),
                 "bic"=which.min(out$models_path$bic),
-                "cv"=which.min(out$models_path$cv_Score)
+                "cv"=which.min(out$models_path$cv_score)
   )
   lambda = out$models_path$lambda[best_idx]
   kernel_scale = out$models_path$kernel_scale[best_idx]
+  re_ratio = out$models_path$re_ratio[best_idx]
   
   b1true = instance$true_values$b1
   
@@ -67,7 +68,8 @@ lsvcmm_wrapper = function(data, job, instance, selection="aic", boot=F,
   
   log = list(
     lambda=lambda,
-    kernel_scale=kernel_scale
+    kernel_scale=kernel_scale,
+    re_ratio=re_ratio
   )
   metrics = evaluate(vc, b1true)
   

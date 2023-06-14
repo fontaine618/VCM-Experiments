@@ -3,3 +3,5 @@ old/
 *.rds
 *.pdf
 *.Rhistory
+data/
+*.log

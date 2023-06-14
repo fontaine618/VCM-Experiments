@@ -3,14 +3,12 @@ library(data.table)
 library(tidyverse)
 library(magrittr)
 
-theme_set(theme_minimal())
-
 
 # ==============================================================================
 # Setup batchtools registry
-DIR = "./experiments/exp3/"
+DIR = "./experiments/re_ratio/"
 
-# loadRegistry(DIR, writeable=T)
+# registry = loadRegistry(DIR, writeable=T)
 
 # removeRegistry()
 registry = makeExperimentRegistry(
@@ -19,7 +17,8 @@ registry = makeExperimentRegistry(
   packages=c("dplyr", "magrittr"),
   source=c("./batchtools/utils/metrics.R")
 )
-# registry$cluster.functions = makeClusterFunctionsSocket(ncpus = 10)
+
+registry$cluster.functions = makeClusterFunctionsSocket(ncpus = 10)
 export = list()
 # ------------------------------------------------------------------------------
 
@@ -27,47 +26,27 @@ export = list()
 
 # ==============================================================================
 # Setup problem
-source("./batchtools/problems/synthetic.R")
+source("./batchtools/problems/synthetic_ar.R")
 addProblem(
-  name="synthetic",
-  fun=synthetic,
+  name="synthetic_ar",
+  fun=synthetic_ar,
   data=NULL
 )
-export[["synthetic"]] = synthetic
+export[["synthetic_ar"]] = synthetic_ar
 
 # for debugging
-instance = synthetic(NULL, NULL)
+instance = synthetic_ar(NULL, NULL)
 # ------------------------------------------------------------------------------
 
 
 # ==============================================================================
 # Setup algorithms
-# source("./batchtools/utils/metrics.R")
-# export[["evaluate"]] = evaluate
-source("./batchtools/algorithms/ttest.R")
-addAlgorithm(
-  name="T_test",
-  fun=ttest_wrapper
-)
-source("./batchtools/algorithms/spfda.R")
-addAlgorithm(
-  name="SPFDA",
-  fun=spfda_wrapper
-)
 source("./batchtools/algorithms/lsvcmm.R")
 addAlgorithm(
   name="LSVCMM",
   fun=lsvcmm_wrapper
 )
-source("./batchtools/algorithms/gam.R")
-addAlgorithm(
-  name="GAMM",
-  fun=gam_wrapper
-)
-export[["ttest_wrapper"]] = ttest_wrapper
-export[["spfda_wrapper"]] = spfda_wrapper
 export[["lsvcmm_wrapper"]] = lsvcmm_wrapper
-export[["gam_wrapper"]] = gam_wrapper
 # ------------------------------------------------------------------------------
 
 
@@ -75,12 +54,13 @@ export[["gam_wrapper"]] = gam_wrapper
 # Experimental design
 n_reps=500
 problems = list(
-  synthetic=CJ(
-    n_subjects=c(100),
+  synthetic_ar=CJ(
+    n_subjects=c(60),
     n_timepoints=c(11),
-    prop_observed=c(0.6, 1.), # with and without missing values
-    observation_variance=c(1.),
-    random_effect_variance=c(1., 0.), # with and without random effect
+    prop_observed=c(0.8), 
+    observation_variance=c(0.2),
+    random_effect_variance=c(0., 1., 4.), # with and without random effect
+    random_effect_ar1_correlation=c(0.95), # with and without random effect
     effect_size=c(1.),
     seed=seq(n_reps)
   )
@@ -91,12 +71,13 @@ algorithms = list(
     selection=c("aic"),
     boot=c(F),
     adaptive=c(1.),
-    estimate_variance_components=c(F, F, T),
-    random_effect=c(F, T, T)
-  ),
-  T_test=CJ(method=c("hommel")),
-  SPFDA=CJ(),
-  GAMM=CJ()
+    estimate_variance_components=c(F, F, F, F, F, F, F, T),
+    random_effect=c(T),
+    kernel_scale=c(0.3),
+    lambda=c(-1),
+    re_ratio=c(0, 0.01, 0.1, 1, -1, 10, 100, -1),
+    name=c("no RE", "v=0.01", "v=0.1", "v=1", "proxy", "v=10", "v=100", "estimated")
+  )
 )
 
 addExperiments(
@@ -111,36 +92,32 @@ addExperiments(
 # ==============================================================================
 # Get current status
 summarizeExperiments()
-
-# Prepare parameters
-resources = list(
-  account="stats_dept1",
-  partition="standard",
-  memory="6g", # this is per cpu
-  ncpus=1,
-  walltime="2:00:00",
-  chunks.as.arrayjobs=FALSE,
-  job_name="lsvcmm_exp1"
-)
-
 batchExport(export)
-
-# send one job to see if we coded things correctly
-# testJob(1, external=T)
-
-chunk_df = data.table(job.id=seq(findJobs() %>% nrow), chunk=1:100)
-head(chunk_df)
-submitJobs(chunk_df, resources)
+submitJobs(resources=list(walltime=1000))
 getStatus()
-# 1.5 hrs for 500 reps x 4 problems x 6 methods (3LSVCMM, T, GAMM, SPFDA)
 
-# in case walltime was not enough, run this to resume
-# not_done = findNotDone()
-# chunk_df = data.table(job.id=not_done$job.id, chunk=1:100)
-# head(chunk_df)
-# submitJobs(chunk_df, resources)
+# # in case walltime was not enough, run this to resume
+not_done = findNotDone()
+submitJobs(not_done$job.id, resources=list(walltime=1000))
+# job = makeJob(2000)
+# job$prob.pars
+# instance = job$instance
+# df = instance$data_long
+# out = VCMM::lsvcmm(
+#   data=df,
+#   response="response",
+#   subject="subject_id",
+#   time="time",
+#   vc_covariates="group",
+#   cv=0,
+#   estimate_variance_components=T,
+#   random_effect=T,
+#   kernel_scale=0.3,
+#   lambda=0.02,
+#   adaptive=1,
+#   re_ratio=-1
+# )
 
-job = makeJob(4548)
 # ------------------------------------------------------------------------------
 
 
@@ -153,11 +130,11 @@ library(data.table)
 library(tidyverse)
 library(magrittr)
 
-DIR = "./experiments/exp3/"
+DIR = "./experiments/re_ratio/"
 loadRegistry(DIR)
 
-source("./batchtools/problems/synthetic.R")
-instance = synthetic(NULL, NULL)
+source("./batchtools/problems/synthetic_ar.R")
+instance = synthetic_ar(NULL, NULL)
 t0 = instance$true_values$time
 
 decision = function(result) result$vc$excludes_zero
@@ -173,6 +150,14 @@ write.csv(estimates, paste0(DIR, "estimates.csv"), row.names=F)
 
 parameters = getJobPars() %>% unwrap()
 write.csv(parameters, paste0(DIR, "parameters.csv"), row.names=F)
+
+
+# estpars = reduceResultsDataTable(fun = function(result) result$log$re_ratio) %>% unwrap()
+# estpars %<>% mutate(job.id=as.character(job.id)) %>% left_join(parameters%>% 
+#                          rownames_to_column(var="job.id") %>% 
+#                          select(job.id, algo_display, prob_display), by="job.id")
+# 
+# with(estpars, table(result.1, algo_display, prob_display))
 # ------------------------------------------------------------------------------
 
 
@@ -185,35 +170,21 @@ library(data.table)
 library(tidyverse)
 library(magrittr)
 
-DIR = "./experiments/exp3/"
+DIR = "./experiments/re_ratio/"
 loadRegistry(DIR)
+
+theme_set(theme_minimal())
 
 decisions = read.csv(paste0(DIR, "decisions.csv")) %>% column_to_rownames(var="job.id")
 estimates = read.csv(paste0(DIR, "estimates.csv")) %>% column_to_rownames(var="job.id")
-decisions = 1*(abs(estimates)>1e-10)
 parameters = read.csv(paste0(DIR, "parameters.csv")) %>% column_to_rownames(var="job.id")
 
 parameters %<>% mutate(
-  algo_display = paste(
-    algorithm, 
-    ifelse(
-      algorithm=="LSVCMM", 
-      paste0(
-        " (",
-        ifelse(random_effect, 
-               ifelse(estimate_variance_components, "Estimated", "Proxy"),
-               "Independent"),
-        ")"
-      ), ""), 
-    sep=""
-  )
+  algo_display = paste0(algorithm, " (", name, ")")
 )
 
 parameters %<>% mutate(
-  prob_display = paste0(
-    100*prop_observed, "% Observed, ",
-    ifelse(random_effect_variance>0., "w/ RE", "w/o RE")
-  )
+  prob_display = paste0("RE variance: ", random_effect_variance)
 )
 
 b1true = instance$true_values$b1
@@ -281,9 +252,12 @@ for(i in seq_along(probs)){
       linewidth=5, alpha=0.2
     ) + 
     geom_boxplot(
-      data=estmat %>% filter(prob_display==prob, algo_display!="GAMM", algo_display!="T_test"),
-      mapping=aes(x=time2, y=estimate, fill=algo_display, group=paste(algo_display, time2)),
-      outlier.alpha=0.05
+      data=estmat %>% filter(prob_display==prob),
+      mapping=aes(x=time2, y=estimate, 
+                  color=algo_display, 
+                  fill=algo_display,
+                  group=paste(algo_display, time2)),
+      outlier.alpha=0.05, alpha=0.2
     ) + theme(
       legend.position="none",
       axis.title.x=element_blank(),
@@ -293,7 +267,7 @@ for(i in seq_along(probs)){
   
   g0 = ggplot() + 
     geom_bar(
-      data=pred0mat %>% filter(prob_display==prob, algo_display!="GAMM", algo_display!="T_test"),
+      data=pred0mat %>% filter(prob_display==prob),
       mapping=aes(x=time2, y=pred0, fill=algo_display),
       stat="summary",
       position="dodge",
@@ -307,7 +281,7 @@ for(i in seq_along(probs)){
   
   g1 = ggplot() + 
     geom_bar(
-      data=pred1mat %>% filter(prob_display==prob, algo_display!="GAMM", algo_display!="T_test"),
+      data=pred1mat %>% filter(prob_display==prob),
       mapping=aes(x=time2, y=pred1, fill=algo_display),
       stat="summary",
       position="dodge",
@@ -321,9 +295,12 @@ for(i in seq_along(probs)){
   
   gerr = ggplot() + 
     geom_boxplot(
-      data=sqerrmat %>% filter(prob_display==prob, algo_display!="GAMM", algo_display!="T_test"),
-      mapping=aes(x=time2, y=sqerr, fill=algo_display, group=paste(algo_display, time2)),
-      outlier.alpha=0.05
+      data=sqerrmat %>% filter(prob_display==prob),
+      mapping=aes(x=time2, y=sqerr, 
+                  color=algo_display, 
+                  fill=algo_display,
+                  group=paste(algo_display, time2)),
+      outlier.alpha=0.05, alpha=0.2
     ) + scale_y_sqrt(limits=c(0, 2)) + theme(
       legend.position="none"
     ) + ylab("Squared error") + xlab("Time")
@@ -357,7 +334,7 @@ for(i in seq_along(probs)){
 
 
 glegend = ggplot(
-  data=sqerrmat %>% filter(prob_display==prob, algo_display!="GAMM", algo_display!="T_test"), 
+  data=sqerrmat %>% filter(prob_display==probs[1], algo_display!="GAMM", algo_display!="T_test"), 
   aes(fill=algo_display, x=time2, y=sqerr)
 ) + 
   geom_bar(alpha=0, stat="identity") + 
@@ -372,19 +349,92 @@ glegend = ggplot(
         panel.grid = element_blank()
   )
 
-gs[[20]] = glegend
+gs[[15]] = glegend
 
 g = cowplot::plot_grid(
   plotlist=gs,
   ncol=length(probs),
-  nrow=5, align="hv", axis="tlbr",
+  nrow=5, 
+  align="v", axis="tblr",
   byrow=F
 )
 
 ggsave(
-  paste0(DIR, "figures/results.pdf"),
+  paste0(DIR, "results.pdf"),
   g,
-  width=16, height=12
+  width=12, height=12
 )
+
+
+
+
+
+gs = list()
+for(i in seq_along(probs)){
+  prob = probs[i]
+  
+  gest = ggplot() + 
+    geom_line(
+      data=data.frame(y=b1true, x=t0),
+      mapping=aes(x=x, y=y),
+      linewidth=1, alpha=1
+    ) + 
+    geom_boxplot(
+      data=estmat %>% filter(prob_display==prob),
+      mapping=aes(x=time2, y=estimate, 
+                  color=algo_display, 
+                  fill=algo_display,
+                  group=paste(algo_display, time2)),
+      outlier.alpha=0.05, alpha=0.2
+    ) + theme(
+      legend.position="none"
+    ) + ylab("Estimated group difference") + ggtitle(prob) + ylim(-1, 2) + xlab("Time")
+  
+  if(i>1){
+    gest = gest + theme(
+      axis.title.y=element_blank(),
+      axis.ticks.y=element_blank(),
+      axis.text.y=element_blank()
+    )
+  }
+  
+  gs  = c(gs, list(gest, NULL))
+  
+}
+
+
+glegend = ggplot(
+  data=sqerrmat %>% filter(prob_display==probs[1]),
+  aes(fill=algo_display, x=time2, y=sqerr)
+) + 
+  geom_bar(alpha=0, stat="identity") + 
+  guides(fill = guide_legend(override.aes = list(alpha=1), nrow=2))+ 
+  theme(axis.title = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        legend.position = c(0.5, 0.5),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 8),
+        legend.key = element_rect(fill='NA'),
+        panel.grid = element_blank()
+  )
+
+gs[[4]] = glegend
+
+g = cowplot::plot_grid(
+  plotlist=gs,
+  ncol=length(probs),
+  nrow=2, 
+  align="v", axis="tblr",
+  byrow=F, 
+  rel_heights=c(5, 1)
+)
+
+ggsave(
+  paste0(DIR, "results2.pdf"),
+  g,
+  width=12, height=4
+)
+
 
 # ------------------------------------------------------------------------------

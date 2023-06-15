@@ -18,7 +18,7 @@ synthetic_ar = function(
   thetamat = mvtnorm::rmvnorm(n_subjects, sigma=corrmat) * sqrt(random_effect_variance)
   t0 = seq(0, n_timepoints-1) / (n_timepoints-1)
   timemat = matrix(t0, n_subjects, n_timepoints, byrow=T)
-  f0 = function(t) -t
+  f0 = function(t) t*0.
   f1raw = function(t) 1/(1+exp((0.6-t)*20))
   f1 = function(t) ifelse(abs(f1raw(t)) < 0.1, 0, f1raw(t))
   group = sample(0:1, n_subjects, T)

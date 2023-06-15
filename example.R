@@ -118,7 +118,7 @@ out = VCMM::lsvcmm(
   lambda_factor=0.005, # lambda_min = lambda_factor * lambda_max
   n_lambda=100, # how many lambda to estimate (log sequence)
   adaptive=1., # adaptive power parameter, 0=no adaptation
-  kernel="squared_exponential",  # only one implemented yet
+  kernel="epa",  # only one implemented yet
   kernel_scale=NULL, # NULL=estimate at multiple values
   kernel_scale_factor=10, # range will be [h/10, h*10], h=n^-0.2
   n_kernel_scale=21 # how many kernel scale to estimate (log sequence)
